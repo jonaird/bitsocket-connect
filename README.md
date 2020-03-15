@@ -29,7 +29,7 @@ bitsocket.connect(query, function(tx){
 Closes the Bitsocket and returns the Last-Event-Id in case you would like to reopen the socket or null if there is none.
 
 ### getLatest()
-An async function that gets the latest transaction matching your query that was received by the Bitcoin network **before** opening the Bitsocket. This can either be an confirmed or unconfirmed transaction.   
+An async function that gets the latest transaction matching your query that was received by the Bitcoin network **before** opening the Bitsocket. This can either be a confirmed or unconfirmed transaction.   
 
 example:   
 `bitsocket.getLatest().then(latest=>console.log(latest));`
