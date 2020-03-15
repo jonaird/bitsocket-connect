@@ -1,17 +1,21 @@
 const EventSource = require('eventsource');
 
 var socket;
+var lastEventId=null;
 
 
 exports.close = function () {
     if (socket) {
         socket.close();
     }
+    
+    return lastEventId;
+    
 }
-exports.connect = function (query, processFunction) {
+exports.connect = function (query, processFunction, leid) {
     const b64 = Buffer.from(JSON.stringify(query)).toString("base64")
     var processing = false;
-    var lastEventId;
+
     var queue = [];
 
 
@@ -46,7 +50,10 @@ exports.connect = function (query, processFunction) {
     function openSocket(useLastEventId) {
         if (useLastEventId && lastEventId) {
             socket = new EventSource('https://txo.bitsocket.network/s/' + b64, { headers: { "Last-Event-Id": lastEventId } })
-        } else {
+        } else if (leid) {
+            socket = new EventSource('https://txo.bitsocket.network/s/' + b64, { headers: { "Last-Event-Id": leid } })
+        }
+        else {
             socket = new EventSource('https://txo.bitsocket.network/s/' + b64)
         }
         socket.onmessage = function (e) {
