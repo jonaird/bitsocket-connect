@@ -2,16 +2,42 @@ const EventSource = require('eventsource');
 
 var socket;
 var lastEventId=null;
+var latestTxMatch= null;
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 
 
 exports.close = function () {
     if (socket) {
         socket.close();
+        socket = null;
+        latestTxMatch=null;
     }
     
     return lastEventId;
     
 }
+
+exports.getLatest= async function(){
+    return new Promise(async resolve=>{
+        if(socket&&latestTxMatch){
+            resolve(latestTxMatch);
+        } else if(socket&&!latestTxMatch){
+            while(!latestTxMatch){
+               await sleep(1000);
+            }
+            resolve(latestTxMatch);
+        }else{
+            resolve(null);
+        }
+    })
+    
+}
+
 exports.connect = function (query, processFunction, leid) {
     const b64 = Buffer.from(JSON.stringify(query)).toString("base64")
     var processing = false;
@@ -61,7 +87,12 @@ exports.connect = function (query, processFunction, leid) {
             d = JSON.parse(e.data);
             if (d.type != 'open') {
                 d.data.forEach(tx => {
-                    queue.push(tx);
+                    if(!latestTxMatch){
+                        latestTxMatch=tx;
+                    }else{
+                        queue.push(tx);
+                    }
+                    
                 });
             }
             if (!processing && queue.length > 0) {
