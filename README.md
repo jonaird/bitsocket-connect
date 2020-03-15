@@ -33,7 +33,7 @@ An async function that gets the latest transaction matching your query **before*
 
 ## Reliability
 
-Since websockets can sometimes be unreliable, bitsocket-connect automatically reopens the websocket every hour and uses Last-Event-Id to ensure that no transactions are lost. 
+Since websockets can sometimes be unreliable, bitsocket-connect automatically reopens the websocket every hour and uses Last-Event-Id to ensure that no transactions are lost. If your Bitsocket is not open, it returns null.
 
 Have fun!
 
