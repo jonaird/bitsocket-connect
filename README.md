@@ -7,7 +7,7 @@
 
 in the browser include the following script tag in your document header:
 
-`<script type="text/javascript" src='https://x.bitfs.network/58e08db775da80c45f82ec4c28204aa228140c32c2d1aaa8b5911e5b8d57f9f5.out.0.3'/>`
+`<script type="text/javascript" src='https://x.bitfs.network/58e08db775da80c45f82ec4c28204aa228140c32c2d1aaa8b5911e5b8d57f9f5.out.0.3'></script>`
 
 ## Usage
 
@@ -20,8 +20,13 @@ bitsocket-connect includes 3 functions to interface with Bitsocket; connect, get
 **lastEventId**: Use the Last-Event-Id from close() to reopen a Bitsocket from where you left off.
 
 example:
+
+in node:   
+`const bitsocket = require('bitsocket-connect');`
+
+node and browser:
+
 ```
-const bitsocket = require('bitsocket-connect');
 const query = { "v": 3, "q": { "find": {} } };
 
 bitsocket.connect(query, function(tx){
