@@ -1,16 +1,21 @@
 const EventSource = require('eventsource');
-const {sleep, Queue} = require('./utils.js');
+const {sleep, SelfDrainingQueue} = require('./utils.js');
 
 var socket;
 var lastEventId=null;
 var latestTxMatch= null;
+var interval;
 
 
 exports.close = function () {
     if (socket) {
         socket.close();
     }
-    clearInterval();
+    if(interval){
+        clearInterval(interval);
+        interval=null;
+    }
+    
     socket = null;
     latestTxMatch=null;
     var leid = lastEventId;
@@ -38,25 +43,9 @@ exports.getLatest= async function(){
 
 exports.connect = function (query, process, leid) {
     const b64 = Buffer.from(JSON.stringify(query)).toString("base64")
-    var draining = false;
+    var queue = new SelfDrainingQueue(process);
 
-    var queue = new Queue();
-
-
-    async function drainQueue() {
-        draining = true;
-        
-        while(queue.getLength()>0){
-            if (process.constructor.name == 'AsyncFunction') {
-                var tx = queue.dequeue();
-                await process(tx)
-            } else {
-                var tx = queue.dequeue();
-                process(tx);
-            }
-        }
-        draining = false;
-    }
+    
 
     function reopenSocket() {
         socket.close();
@@ -84,15 +73,13 @@ exports.connect = function (query, process, leid) {
                     
                 });
             }
-            if (!draining) {
-                drainQueue();
-            }
         }
 
     }
-    openSocket();
+    
+    openSocket(leid);
 
-    setInterval(() => {
+    interval = setInterval(() => {
         reopenSocket();
     }, 3600000);
 
