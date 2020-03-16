@@ -1,13 +1,17 @@
 # bitsocket-connect
- A plug and play [Bitsocket](https://bitsocket.network/#/) connection for Nodejs.
+ A plug and play [Bitsocket](https://bitsocket.network/#/) connection for Nodejs and browser.
  
 ## Install
 
 `npm i --save bitsocket-connect`
 
+in the browser include the following script tag in your document header:
+
+`<script type="text/javascript" src='https://x.bitfs.network/58e08db775da80c45f82ec4c28204aa228140c32c2d1aaa8b5911e5b8d57f9f5.out.0.3'/>`
+
 ## Usage
 
-bitsocket-connect includes 3 functions to interface with Bitsocket, connect, getLatest close:
+bitsocket-connect includes 3 functions to interface with Bitsocket; connect, getLatest, and close:
 
 ### connect(query, process, (optional) lastEventId)
 
@@ -24,6 +28,7 @@ bitsocket.connect(query, function(tx){
  console.log(tx)
  });
 ```
+
 
 ### close()
 Closes the Bitsocket and returns the Last-Event-Id in case you would like to reopen the socket or null if there is none.
