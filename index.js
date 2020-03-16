@@ -1,24 +1,22 @@
 const EventSource = require('eventsource');
+const {sleep, Queue} = require('./utils.js');
 
 var socket;
 var lastEventId=null;
 var latestTxMatch= null;
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-
 
 exports.close = function () {
     if (socket) {
         socket.close();
-        socket = null;
-        latestTxMatch=null;
     }
+    clearInterval();
+    socket = null;
+    latestTxMatch=null;
+    var leid = lastEventId;
+    lastEventId=null;
     
-    return lastEventId;
+    return leid;
     
 }
 
@@ -38,51 +36,42 @@ exports.getLatest= async function(){
     
 }
 
-exports.connect = function (query, processFunction, leid) {
+exports.connect = function (query, process, leid) {
     const b64 = Buffer.from(JSON.stringify(query)).toString("base64")
-    var processing = false;
+    var draining = false;
 
-    var queue = [];
+    var queue = new Queue();
 
 
     async function drainQueue() {
-        processing = true;
-        let n = 0
-        for (i = 0; i < queue.length; i++) {
-            if (processFunction.constructor.name == 'AsyncFunction') {
-                await processFunction(queue[i])
+        draining = true;
+        
+        while(queue.getLength()>0){
+            if (process.constructor.name == 'AsyncFunction') {
+                var tx = queue.dequeue();
+                await process(tx)
             } else {
-                processFunction(queue[i]);
+                var tx = queue.dequeue();
+                process(tx);
             }
-            n++
         }
-        while (n > 0) {
-            queue.shift();
-            n--
-        }
-
-        if (queue.length > 0) {
-            drainQueue();
-        } else {
-            processing = false;
-        }
+        draining = false;
     }
 
     function reopenSocket() {
         socket.close();
-        openSocket(true);
+        openSocket(lastEventId);
     }
 
-    function openSocket(useLastEventId) {
-        if (useLastEventId && lastEventId) {
-            socket = new EventSource('https://txo.bitsocket.network/s/' + b64, { headers: { "Last-Event-Id": lastEventId } })
-        } else if (leid) {
+    function openSocket(leid) {
+        if (leid) {
             socket = new EventSource('https://txo.bitsocket.network/s/' + b64, { headers: { "Last-Event-Id": leid } })
         }
         else {
             socket = new EventSource('https://txo.bitsocket.network/s/' + b64)
         }
         socket.onmessage = function (e) {
+           
             lastEventId = e.lastEventId;
             d = JSON.parse(e.data);
             if (d.type != 'open') {
@@ -90,12 +79,12 @@ exports.connect = function (query, processFunction, leid) {
                     if(!latestTxMatch){
                         latestTxMatch=tx;
                     }else{
-                        queue.push(tx);
+                        queue.enqueue(tx);
                     }
                     
                 });
             }
-            if (!processing && queue.length > 0) {
+            if (!draining) {
                 drainQueue();
             }
         }
