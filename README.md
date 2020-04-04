@@ -11,7 +11,7 @@ in the browser include the following script tag in your document header:
 
 ## Usage
 
-bitsocket-connect includes 3 functions to interface with Bitsocket; connect, getLatest, and close:
+bitsocket-connect includes 3 functions to interface with Bitsocket; connect, getLatest, and close. Use crawlRecent to crawl the last 24 hours of transactions.
 
 ### connect(query, process, (optional) lastEventId)
 
