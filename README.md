@@ -44,9 +44,8 @@ Gets the latest transaction matching your query that was received by the Bitcoin
 example:   
 `bitsocket.getLatest().then(latest=>console.log(latest));`
 
-## Reliability
-
-Since websockets can sometimes be unreliable, bitsocket-connect automatically reopens the websocket every hour and uses Last-Event-Id to ensure that no transactions are lost. If your Bitsocket is not open, it returns null.
+### crawlRecent(token, query, process, callback)
+Crawls the last 24 hours of the [Bitsocket event database](https://medium.com/@_unwriter/bitcoin-event-database-55a182ffe466). Uses the same api as [run-bitbus](https://github.com/jonaird/run-bitbus)
 
 Have fun!
 
