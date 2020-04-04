@@ -5,7 +5,7 @@
 
 `npm i --save bitsocket-connect`
 
-in the browser include the following script tag in your document header:
+in the browser include the following script tag in your document header (crawlRecent not supported in the browser) :
 
 `<script type="text/javascript" src='https://x.bitfs.network/58e08db775da80c45f82ec4c28204aa228140c32c2d1aaa8b5911e5b8d57f9f5.out.0.3'></script>`
 
