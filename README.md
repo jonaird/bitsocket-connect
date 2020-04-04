@@ -44,7 +44,7 @@ Gets the latest transaction matching your query that was received by the Bitcoin
 example:   
 `bitsocket.getLatest().then(latest=>console.log(latest));`
 
-### crawlRecent(token, query, process, callback)
+### crawlRecent(token, query, process, (optional) callback)
 Crawls the last 24 hours of the [Bitsocket event database](https://medium.com/@_unwriter/bitcoin-event-database-55a182ffe466). Uses the same api as [run-bitbus](https://github.com/jonaird/run-bitbus)
 
 Have fun!
