@@ -1,5 +1,7 @@
 const EventSource = require('eventsource');
 const {sleep, SelfDrainingQueue} = require('./utils.js');
+const es = require('event-stream');
+const fetch = require('node-fetch')
 
 var socket;
 var lastEventId=null;
@@ -35,6 +37,7 @@ exports.getLatest= async function(){
             }
             resolve(latestTxMatch);
         }else{
+            console.log('You must open a Bitsocket connection in order to call getLatest()')
             resolve(null);
         }
     })
@@ -85,4 +88,38 @@ exports.connect = function (query, process, leid) {
 
 
 
+}
+
+exports.crawlRecent = function crawlRecent(token, query, process, callback) {
+    var queue = new SelfDrainingQueue(process);
+
+    async function onSyncFinish() {  
+        while(!queue.isDrained()){
+            await sleep(200)
+        }
+        if(callback){
+            callback();
+        }
+    }
+
+    fetch("https://txo.bitsocket.network/crawl", {
+        method: "post",
+        headers: {
+            'Content-type': 'application/json; charset=utf-8',
+            'token': token
+        },
+        body: JSON.stringify(query)
+    })
+        .then((res) => {
+            res.body.on("end", () => {
+                onSyncFinish();
+            }).pipe(es.split())
+                .pipe(es.map((data, callback) => {
+                    if (data) {
+                        let d = JSON.parse(data);
+                        queue.enqueue(d);
+                        callback();
+                    }
+                }))
+        })
 }

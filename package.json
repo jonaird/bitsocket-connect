@@ -1,6 +1,6 @@
 {
   "name": "bitsocket-connect",
-  "version": "1.2.4",
+  "version": "1.3.5",
   "description": "A plug and play Bitsocket connection.",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "eventsource": "^1.0.7"
+    "eventsource": "^1.0.7",
+    "event-stream": "^4.0.1",
+    "node-fetch": "^2.6.0"
   }
 }
