@@ -44,10 +44,11 @@ exports.getLatest= async function(){
     
 }
 
-exports.connect = function (query, process, leid) {
+exports.connect = function (query, process, leid, endPoint) {
     const b64 = Buffer.from(JSON.stringify(query)).toString("base64")
     var queue = new SelfDrainingQueue(process);
-
+    var url;
+    endPoint?url=endPoint:url = 'https://txo.bitsocket.network/s/';
     
 
     function reopenSocket() {
@@ -57,10 +58,10 @@ exports.connect = function (query, process, leid) {
 
     function openSocket(leid) {
         if (leid) {
-            socket = new EventSource('https://txo.bitsocket.network/s/' + b64, { headers: { "Last-Event-Id": leid } })
+            socket = new EventSource( url + b64, { headers: { "Last-Event-Id": leid } })
         }
         else {
-            socket = new EventSource('https://txo.bitsocket.network/s/' + b64)
+            socket = new EventSource(url + b64)
         }
         socket.onmessage = function (e) {
            
@@ -90,19 +91,22 @@ exports.connect = function (query, process, leid) {
 
 }
 
-exports.crawlRecent = function crawlRecent(token, query, process, callback) {
+exports.crawlRecent = function crawlRecent(token, query, process, callback, endPoint) {
     var queue = new SelfDrainingQueue(process);
 
     async function onSyncFinish() {  
         while(!queue.isDrained()){
-            await sleep(200)
+            await sleep(200);
         }
         if(callback){
             callback();
         }
     }
 
-    fetch("https://txo.bitsocket.network/crawl", {
+    var url;
+    endPoint?url=endPoint:url="https://txo.bitsocket.network/crawl";
+
+    fetch(url, {
         method: "post",
         headers: {
             'Content-type': 'application/json; charset=utf-8',

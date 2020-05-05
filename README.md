@@ -13,11 +13,12 @@ in the browser include the following script tag in your document header:
 
 bitsocket-connect includes 3 functions to interface with Bitsocket; connect, getLatest, and close. Use crawlRecent to crawl the last 24 hours of transactions.
 
-### connect(query, process, (optional) lastEventId)
+### connect(query, process, (optional) lastEventId, (optional) endPoint)
 
 **query**: A [TXO](https://medium.com/@_unwriter/txo-2-0-fee049bc6795) query used to filter new transactions.   
 **process**: A function that is called individually on each incoming transaction from Bitsocket and is passed the transaction as a parameter. Can be synchronous or async but if it is async be sure to return a promise that resolves when done processing the transaction to ensure all transactions are processed in the correct order.   
-**lastEventId**: Use the Last-Event-Id from close() to reopen a Bitsocket from where you left off.
+**lastEventId**: Use the Last-Event-Id from close() to reopen a Bitsocket from where you left off.  
+**endPoint**: Bitsocket endpoint. defaults to TXO
 
 example:
 
@@ -44,7 +45,7 @@ Gets the latest transaction matching your query that was received by the Bitcoin
 example:   
 `bitsocket.getLatest().then(latest=>console.log(latest));`
 
-### crawlRecent(token, query, process, (optional) callback)
+### crawlRecent(token, query, process, (optional) callback, (optional) endPoint)
 Crawls the last 24 hours of the [Bitsocket event database](https://medium.com/@_unwriter/bitcoin-event-database-55a182ffe466). Uses the same api as [run-bitbus](https://github.com/jonaird/run-bitbus)
 
 Have fun!
