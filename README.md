@@ -1,5 +1,10 @@
 # bitsocket-connect
  A plug and play [Bitsocket](https://bitsocket.network/#/) connection for Nodejs and browser.
+
+ ## Breaking changes
+The latest version of bitsocket-connect no longer uses the callback method when crawling the event database. The api use to be
+crawlRecent(token, query, processFunction, callback, endPoint). Instead crawlRecent is an async function
+and so you can use .then() or async await.
  
 ## Install
 
@@ -45,7 +50,7 @@ Gets the latest transaction matching your query that was received by the Bitcoin
 example:   
 `bitsocket.getLatest().then(latest=>console.log(latest));`
 
-### crawlRecent(token, query, process, (optional) callback, (optional) endPoint)
+### crawlRecent(token, query, process, (optional) endPoint)
 Crawls the last 24 hours of the [Bitsocket event database](https://medium.com/@_unwriter/bitcoin-event-database-55a182ffe466). Uses the same api as [run-bitbus](https://github.com/jonaird/run-bitbus)
 
 Have fun!
