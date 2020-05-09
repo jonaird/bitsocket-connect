@@ -85,7 +85,7 @@ exports.connect = function (query, process, leid, endPoint) {
 
     interval = setInterval(() => {
         reopenSocket();
-    }, 3600000);
+    }, 900000);
 
 
 
