@@ -53,21 +53,32 @@ exports.connect = function (query, process, leid, endPoint) {
 
     function reopenSocket() {
         socket.close();
+        latestTxMatch = null;
         openSocket(lastEventId);
     }
 
     function openSocket(leid) {
-        if (leid) {
-            socket = new EventSource(url + b64, { headers: { "Last-Event-Id": leid } })
+        try {
+            if (leid) {
+                socket = new EventSource(url + b64, { headers: { "Last-Event-Id": leid } })
+            }
+            else {
+                socket = new EventSource(url + b64)
+            }
+        } catch (error) {
+            console.log('Error in SSE socket, attempting to reconnect: ', error)
+            reopenSocket()
+
         }
-        else {
-            socket = new EventSource(url + b64)
+        socket.onerror = function (error) {
+            console.log('Error in SSE socket, attempting to reconnect: ', error)
+            reopenSocket()
         }
         socket.onmessage = function (e) {
 
-            lastEventId = e.lastEventId;
             d = JSON.parse(e.data);
             if (d.type != 'open') {
+                lastEventId = e.lastEventId;
                 d.data.forEach(tx => {
                     if (!latestTxMatch) {
                         latestTxMatch = tx;
@@ -76,6 +87,8 @@ exports.connect = function (query, process, leid, endPoint) {
                     }
 
                 });
+            } else{
+                lastEventId=null
             }
         }
 
