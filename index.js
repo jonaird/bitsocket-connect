@@ -52,6 +52,10 @@ exports.connect = function (query, process, leid, endPoint) {
 
 
     function reopenSocket() {
+        // If the socket was closed, it should not be re-opened
+        if (!socket) {
+            return;
+        }
         socket.close();
         latestTxMatch = null;
         openSocket(lastEventId);
